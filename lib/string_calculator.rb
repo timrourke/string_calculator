@@ -28,7 +28,7 @@ class StringCalculator
 
     delimiters << matches[:delimiter] if matches
 
-    Regexp.new(sprintf("[%s]", delimiters))
+    Regexp.new("[#{delimiters}]")
   end
 
   def raise_if_contains_negatives(digits)
