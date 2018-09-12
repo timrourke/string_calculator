@@ -3,15 +3,11 @@ class StringCalculator
   DELIMITER_REGEX=/^\/\/(?<delimiter>[\D]+)\n(?<numbers>[\d\D]*)$/
 
   def add(str)
-    if str.empty? then
-      return 0
-    end
+    return 0 if str.empty?
 
     regex = delimiter_for_string(str)
        
-    digits = str.split(regex)
-      .map { |digit| digit.to_i }
-      .select{ |digit| digit < 1001 }
+    digits = split_and_limit_to_less_than_1001(str, regex)
 
     raise_if_contains_negatives(digits)
 
@@ -20,23 +16,25 @@ class StringCalculator
 
   private
 
+  def split_and_limit_to_less_than_1001(str, regex)
+    str.split(regex)
+      .map(&:to_i)
+      .select { |digit| digit < 1001 }
+  end
+
   def delimiter_for_string(str)
     delimiters = ",\n"
     matches = StringCalculator::DELIMITER_REGEX.match(str)
 
-    unless matches.nil? then
-      delimiters << matches[:delimiter]
-    end
+    delimiters << matches[:delimiter] if matches
 
     Regexp.new(sprintf("[%s]", delimiters))
   end
 
   def raise_if_contains_negatives(digits)
-    negatives = digits.select{ |digit| digit.negative? }
+    negs = digits.select{ |digit| digit.negative? }
 
-    unless negatives.empty? then
-      raise ArgumentError.new("negatives not allowed. got: " + negatives.to_s)
-    end
+    raise ArgumentError.new("negatives not allowed. got: #{negs}") unless negs.empty?
   end
 
 end
